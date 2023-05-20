@@ -1,0 +1,10 @@
+
+
+
+export const Formulario = () => {
+  return (
+    <>
+      <h1>Formulario</h1>
+    </>
+  )
+}
