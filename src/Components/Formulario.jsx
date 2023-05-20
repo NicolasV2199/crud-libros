@@ -7,7 +7,46 @@ import { collection, doc, addDoc, onSnapshot, deleteDoc, updateDoc } from "fireb
 export const Formulario = () => {
 
   const [nombreLibro, setNombreLibro] = useState('');
-  const [nombreAutor, setNombreAutor] = useState('')
+  const [nombreAutor, setNombreAutor] = useState('');
+  const [listaLibros, setListaLibros] = useState([]);
+
+
+  useEffect(() => {
+    obtenerDatos();
+  }, [])
+  
+
+  const obtenerDatos = async() => {
+    try {
+      await onSnapshot(collection(db, 'libros'), (query) => {
+        setListaLibros(query.docs.map((doc) => ({...doc.data, id: doc.id})))
+      })
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const guardarLibros = async(e) => {
+    e.preventDefault();
+
+    try {
+      const data = await addDoc(collection(db, 'libros'), {
+        nombreLibro,
+        nombreAutor,
+      })
+      setListaLibros([...listaLibros, {
+        nombreLibro,
+        nombreAutor,
+        id: data.id,
+      }])
+
+      setNombreAutor('');
+      setNombreLibro('');
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
   
   return (
     <div className="container mt-5">
@@ -27,10 +66,20 @@ export const Formulario = () => {
 
         <div className="col-4">
           <h4 className="text-center">Lstado de libros</h4>
-          <form>
-            <input type="text" className="form-control mb-2" placeholder="Ingrese Nombre del libro" />
-            <input type="text" className="form-control mb-2" placeholder="Ingrese autor del libro" />
-            <button className="btn btn-primary btn-block">Agregar</button>
+          <form onSubmit={guardarLibros}>
+            <input
+              type="text"
+              className="form-control mb-2"
+              placeholder="Ingrese Nombre del libro"
+              value={nombreAutor}
+              onChange={(e) => setNombreAutor(e.target.value)} />
+            <input
+              type="text"
+              className="form-control mb-2"
+              placeholder="Ingrese autor del libro"
+              value={nombreLibro}
+              onChange={(e) => setNombreLibro(e.target.value)} />
+            <button className="btn btn-primary btn-block" type="submit">Agregar</button>
           </form>
         </div>
       </div>
